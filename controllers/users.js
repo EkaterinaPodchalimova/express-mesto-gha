@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const mongoose = require('mongoose');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -9,18 +10,21 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUsersById = (req, res) => {
   User.findById(req.params.userId)
     .then(users => {
-      if(users == null) {
+      if (users == null) {
         return res.status(404).send({message: 'Пользователь по указанному _id не найден'})
       }
       res.send({data: users})
     })
     .catch(err => {
-        if (err.name === 'CastError') {
-          return res.status(404).send({message: 'Пользователь по указанному _id не найден'})
-        } else {
-          return res.status(500).send({message: `Произошла ошибка ${err.name}`})
-        }
-      })
+      if (!mongoose.isValidObjectId(req.params.userId)) {
+        return res.status(400).send({message: 'Пользователь с некорректным _id'})
+      }
+      if (err.name === 'CastError') {
+        return res.status(404).send({message: 'Пользователь по указанному _id не найден'})
+      } else {
+        return res.status(500).send({message: `Произошла ошибка ${err.name}`})
+      }
+    })
 };
 
 module.exports.postUsers = (req, res) => {
