@@ -19,7 +19,7 @@ app.use((req, res, next) => {
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 app.use((req, res,next) => {
-  res.status(404).send('Страница не найдена')
+  res.status(404).send({message: 'Страница не найдена'})
   next()
 });
 
