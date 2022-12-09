@@ -9,8 +9,16 @@ module.exports.getCard = (req, res) => {
 
 module.exports.deleteCardsById = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .then(() => res.send('Карточка удалена!'))
+    .then(card => {
+      if (card == null) {
+        return res.status(404).send({message: 'Передан несуществующий _id карточки.'})
+      }
+      res.send({data: card})
+    })
     .catch((err) => {
+      if (!mongoose.isValidObjectId(req.params.cardId)) {
+        return res.status(400).send({message: 'Переданы некорректные данные карточки.'})
+      }
       if (err.name === 'CastError') {
         return res.status(404).send({message: 'Карточка с указанным _id не найдена.'})
       } else {
@@ -43,7 +51,6 @@ module.exports.likeCard = (req, res) =>
       res.send({data: card})
     })
     .catch((err) => {
-      console.log(2)
       if (!mongoose.isValidObjectId(req.params.cardId)) {
         return res.status(400).send({message: 'Переданы некорректные данные для постановки лайка.'})
       }

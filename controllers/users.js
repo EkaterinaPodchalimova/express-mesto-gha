@@ -17,7 +17,7 @@ module.exports.getUsersById = (req, res) => {
     })
     .catch(err => {
       if (!mongoose.isValidObjectId(req.params.userId)) {
-        return res.status(400).send({message: 'Пользователь с некорректным _id'})
+        return res.status(404).send({message: 'Пользователь с некорректным _id'})
       }
       if (err.name === 'CastError') {
         return res.status(404).send({message: 'Пользователь по указанному _id не найден'})
