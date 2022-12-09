@@ -38,7 +38,12 @@ module.exports.postUsers = (req, res) => {
 module.exports.editUsers = (req, res) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user.id, { name, about }, { new: true, runValidators: true })
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (user == null) {
+        return res.status(ERROR_CODE_404).send({ message: 'Пользователь по указанному _id не найден' });
+      }
+      return res.send({ data: user })
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
