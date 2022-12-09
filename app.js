@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const router = require('express').Router();
 
 const {PORT = 3000} = process.env;
 const app = express();
@@ -17,15 +16,12 @@ app.use((req, res, next) => {
   };
   next();
 });
-app.all('/404', (err, res, next) => {
-  if (err) {
-    return res.status(404).send({message: `Некоректный путь`})
-  } else {
-    next()
-  }
-})
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
+app.use((req, res,next) => {
+  res.status(404).send('Страница не найдена')
+  next()
+});
 
 app.listen(PORT, () => {
   console.log('Ссылка на сервер');

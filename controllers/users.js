@@ -16,11 +16,8 @@ module.exports.getUsersById = (req, res) => {
       res.send({data: users})
     })
     .catch(err => {
-      if (!mongoose.isValidObjectId(req.params.userId)) {
-        return res.status(400).send({message: 'Пользователь с некорректным _id'})
-      }
       if (err.name === 'CastError') {
-        return res.status(404).send({message: 'Пользователь по указанному _id не найден'})
+        return res.status(400).send({message: 'Переданы некорректные данные при создании пользователя.'})
       } else {
         return res.status(500).send({message: `Произошла ошибка ${err.name}`})
       }
@@ -61,7 +58,8 @@ module.exports.editAvatar = (req, res) => {
   User.findByIdAndUpdate(req.user._id, {avatar}, {runValidators: true, new: true})
     .then(user => res.send({data: user}))
     .catch((err) => {
-      if ('string' !== typeof avatar) {
+      console.log(err.name)
+      if (err.name === 'ValidationError') {
         return res.status(400).send({message: `Переданы некорректные данные при обновлении аватара.`})
       }
       if (err.name === 'CastError') {

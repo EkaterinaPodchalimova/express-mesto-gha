@@ -16,9 +16,6 @@ module.exports.deleteCardsById = (req, res) => {
       res.send({data: card})
     })
     .catch((err) => {
-      if (!mongoose.isValidObjectId(req.params.cardId)) {
-        return res.status(400).send({message: 'Переданы некорректные данные карточки.'})
-      }
       if (err.name === 'CastError') {
         return res.status(404).send({message: 'Карточка с указанным _id не найдена.'})
       } else {
@@ -43,7 +40,7 @@ module.exports.createCard = (req, res) => {
 module.exports.likeCard = (req, res) =>
   Card.findByIdAndUpdate(req.params.cardId,
     {$addToSet: {likes: req.user._id}},
-    {new: true, runValidators: true})
+    {new: true})
     .then(card => {
       if (card == null) {
         return res.status(404).send({message: 'Передан несуществующий _id карточки.'})
@@ -51,14 +48,11 @@ module.exports.likeCard = (req, res) =>
       res.send({data: card})
     })
     .catch((err) => {
-      if (!mongoose.isValidObjectId(req.params.cardId)) {
-        return res.status(400).send({message: 'Переданы некорректные данные для постановки лайка.'})
-      }
       if (err.name === 'ValidationError') {
-        return res.status(400).send({message: 'Переданы некорректные данные для постановки лайка.'})
+        return res.status(404).send({message: 'Переданы некорректные данные для постановки лайка.'})
       }
       if (err.name === 'CastError') {
-        return res.status(404).send({message: 'Передан несуществующий _id карточки.'})
+        return res.status(400).send({message: 'Переданы некорректные данные для постановки лайка.'})
       } else {
         return res.status(500).send({message: `Произошла ошибка ${err.status}`})
       }
@@ -67,7 +61,7 @@ module.exports.likeCard = (req, res) =>
 module.exports.dislikeCard = (req, res) =>
   Card.findByIdAndUpdate(req.params.cardId,
     {$pull: {likes: req.user._id}},
-    {new: true, runValidators: true},)
+    {new: true},)
     .then(card => {
       if (card == null) {
         return res.status(404).send({message: 'Передан несуществующий _id карточки.'})
@@ -75,14 +69,12 @@ module.exports.dislikeCard = (req, res) =>
       res.send({data: card})
     })
     .catch((err) => {
-      if (!mongoose.isValidObjectId(req.params.cardId)) {
-        return res.status(400).send({message: 'Переданы некорректные данные для снятии лайка.'})
-      }
+      console.log(err.name)
       if (err.name === 'ValidationError') {
-        return res.status(400).send({message: 'Переданы некорректные данные для снятии лайка.'})
+        return res.status(404).send({message: 'Передан несуществующий _id карточки.'})
       }
       if (err.name === 'CastError') {
-        return res.status(404).send({message: 'Передан несуществующий _id карточки.'})
+        return res.status(400).send({message: 'Переданы некорректные данные для снятии лайка.'})
       } else {
         return res.status(500).send({message: 'Произошла ошибка'})
       }

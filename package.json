@@ -9,7 +9,7 @@
     "start": "node app.js",
     "dev": "nodemon app.js"
   },
-  "author": "",
+  "author": "Podchalimova Ekaterina",
   "license": "ISC",
   "devDependencies": {
     "eslint": "^8.29.0",
