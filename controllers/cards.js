@@ -64,7 +64,7 @@ module.exports.likeCard = (req, res) =>
 module.exports.dislikeCard = (req, res) =>
   Card.findByIdAndUpdate(req.params.cardId,
     {$pull: {likes: req.user._id}},
-    {new: true},)
+    {new: true})
     .then(card => {
       if (card == null) {
         return res.status(404).send({message: 'Передан несуществующий _id карточки.'})
