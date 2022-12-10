@@ -28,7 +28,7 @@ module.exports.deleteCardsById = (req, res) => {
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
-  Card.create({ name, owner: req.user.id, link })
+  Card.create({ name, owner: req.user._id, link })
     .then((card) => res.status(STATUS_201).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -41,7 +41,7 @@ module.exports.createCard = (req, res) => {
 module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
   req.params.cardId,
   {
-    $addToSet: { likes: req.user.id },
+    $addToSet: { likes: req.user._id },
   },
   { new: true },
 )
@@ -62,7 +62,7 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
 module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
   req.params.cardId,
   {
-    $pull: { likes: req.user.id },
+    $pull: { likes: req.user._id },
   },
   { new: true },
 )

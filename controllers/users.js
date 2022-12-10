@@ -39,7 +39,7 @@ module.exports.postUsers = (req, res) => {
 
 module.exports.editUsers = (req, res) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user.id, { name, about }, { new: true, runValidators: true })
+  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (user == null) {
         return res.status(ERROR_CODE_404).send({ message: 'Пользователь по указанному _id не найден' });
@@ -59,7 +59,7 @@ module.exports.editUsers = (req, res) => {
 
 module.exports.editAvatar = (req, res) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user.id, { avatar }, { runValidators: true, new: true })
+  User.findByIdAndUpdate(req.user._id, { avatar }, { runValidators: true, new: true })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
