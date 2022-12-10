@@ -42,7 +42,7 @@ module.exports.editUsers = (req, res) => {
       if (user == null) {
         return res.status(ERROR_CODE_404).send({ message: 'Пользователь по указанному _id не найден' });
       }
-      return res.send({ data: user })
+      return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
