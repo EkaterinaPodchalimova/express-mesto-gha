@@ -6,19 +6,17 @@ const { ERROR_CODE_404 } = require('./utils/constants');
 const { PORT = 3000 } = process.env;
 const app = express();
 
+const { postUsers, login } = require('./controllers/users');
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '6392321d684dbbb419ae5fb7',
-  };
-  next();
-});
-app.use('/users', require('./routes/users'));
+app.post('/signin', login);
+app.post('/signup', postUsers);
 
+app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
 app.use((req, res, next) => {

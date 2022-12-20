@@ -1,6 +1,9 @@
 const User = require('../models/user');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
 const {
-  ERROR_CODE_400, ERROR_CODE_404, ERROR_CODE_500, STATUS_201,
+  ERROR_CODE_400, ERROR_CODE_404, ERROR_CODE_500, ERROR_CODE_409, STATUS_201,
 } = require('../utils/constants');
 
 module.exports.getUsers = (req, res) => {
@@ -25,11 +28,31 @@ module.exports.getUsersById = (req, res) => {
     });
 };
 
+module.exports.getUserNow = (req, res) => {
+  User.findById(req.user._id)
+    .then((users) => {
+      if (users == null) {
+        return res.status(ERROR_CODE_404).send({ message: 'Пользователь по указанному _id не найден' });
+      }
+      return res.send({ data: users });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+      }
+      return res.status(ERROR_CODE_500).send({ message: `Произошла ошибка ${err.name}` });
+    });
+};
+
 module.exports.postUsers = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
+  const { name, about, avatar, email, password } = req.body;
+  bcrypt.hash(password , 10)
+    .then((hash) => User.create({name, about, avatar, email, password: hash}))
     .then((user) => res.status(STATUS_201).send({ data: user }))
     .catch((err) => {
+      if (err.code === 11000) {
+        return res.status(ERROR_CODE_409).send({ message: 'Пользователь с таким email уже существует' });
+      }
       if (err.name === 'ValidationError') {
         return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       }
@@ -69,5 +92,19 @@ module.exports.editAvatar = (req, res) => {
         return res.status(ERROR_CODE_404).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
       }
       return res.status(ERROR_CODE_500).send({ message: `Произошла ошибка ${err.name}` });
+    });
+};
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      res.send({
+        token: jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' }),
+      });
+    })
+    .catch((err) => {
+      res.status(401).send({ message: err.message });
     });
 };
