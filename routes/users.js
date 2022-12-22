@@ -32,6 +32,13 @@ router.patch('/me/avatar', celebrate({
     authorization: Joi.string(),
   }).unknown(true),
 }), auth, editAvatar);
-router.get('/:userId', getUsersById);
+router.get('/:userId', celebrate({
+  [Segments.PARAMS]: Joi.object().keys({
+    userId: Joi.string().hex().length(24).required(),
+  }),
+  [Segments.HEADERS]: Joi.object().keys({
+    authorization: Joi.string(),
+  }).unknown(true),
+}), getUsersById);
 
 module.exports = router;

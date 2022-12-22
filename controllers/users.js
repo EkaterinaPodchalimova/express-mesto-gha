@@ -20,12 +20,7 @@ module.exports.getUsersById = (req, res) => {
       }
       return res.send({ data: users });
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-      }
-      return res.status(ERROR_CODE_500).send({ message: `Произошла ошибка ${err.name}` });
-    });
+    .catch((err) => res.status(ERROR_CODE_500).send({ message: `Произошла ошибка ${err.name}` }));
 };
 
 module.exports.getUserNow = (req, res) => {

@@ -11,6 +11,9 @@ router.get('/', celebrate({
   }).unknown(true),
 }), auth, getCard);
 router.delete('/:cardId', celebrate({
+  [Segments.PARAMS]: Joi.object().keys({
+    cardId: Joi.string().hex().length(24),
+  }),
   [Segments.HEADERS]: Joi.object().keys({
     authorization: Joi.string(),
   }).unknown(true),
@@ -25,11 +28,17 @@ router.post('/', celebrate({
   }).unknown(true),
 }), auth, createCard);
 router.put('/:cardId/likes', celebrate({
+  [Segments.PARAMS]: Joi.object().keys({
+    cardId: Joi.string().hex().length(24).required(),
+  }),
   [Segments.HEADERS]: Joi.object().keys({
     authorization: Joi.string(),
   }).unknown(true),
 }), auth, likeCard);
 router.delete('/:cardId/likes', celebrate({
+  [Segments.PARAMS]: Joi.object().keys({
+    cardId: Joi.string().hex().length(24).required(),
+  }),
   [Segments.HEADERS]: Joi.object().keys({
     authorization: Joi.string(),
   }).unknown(true),
