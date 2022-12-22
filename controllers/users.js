@@ -30,12 +30,8 @@ module.exports.getUsersById = (req, res) => {
 
 module.exports.getUserNow = (req, res) => {
   User.findById(req.user._id)
-    .then((users) => {
-      return res.send({ data: users });
-    })
-    .catch((err) => {
-      return res.status(ERROR_CODE_500).send({ message: `Произошла ошибка ${err.name}` });
-    });
+    .then((users) => res.send({ data: users }))
+    .catch((err) => res.status(ERROR_CODE_500).send({ message: `Произошла ошибка ${err.name}` }));
 };
 
 module.exports.postUsers = (req, res) => {
