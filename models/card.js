@@ -15,6 +15,10 @@ const cardSchema = new mongoose.Schema({
   link: {
     type: String,
     required: true,
+    pattern: {
+      params: /(http|https):\/\/([\w.]+\/?)\S*/,
+      message: 'Должен начинаться с http, https и соответствовать спецификации URL, проверьте правильность формата',
+    },
   },
   likes: [{
     ref: 'user',

@@ -1,6 +1,6 @@
-const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
 const {
   ERROR_CODE_400, ERROR_CODE_404, ERROR_CODE_500, ERROR_CODE_409, STATUS_201,
@@ -45,9 +45,13 @@ module.exports.getUserNow = (req, res) => {
 };
 
 module.exports.postUsers = (req, res) => {
-  const { name, about, avatar, email, password } = req.body;
-  bcrypt.hash(password , 10)
-    .then((hash) => User.create({name, about, avatar, email, password: hash}))
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
     .then((user) => res.status(STATUS_201).send({ data: user }))
     .catch((err) => {
       if (err.code === 11000) {
