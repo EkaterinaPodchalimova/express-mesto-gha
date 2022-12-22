@@ -5,7 +5,8 @@ const handleAuthError = (res) => res.status(401).send({ message: 'Необход
 const extractBearerToken = (header) => header.replace('Bearer ', '');
 
 module.exports = (req, res, next) => {
-  const { authorization } = req.headers.authorization;
+  const { authorization } = req.headers;
+  console.log(authorization)
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
     handleAuthError(res);
@@ -19,6 +20,7 @@ module.exports = (req, res, next) => {
   } catch (err) {
     handleAuthError(res);
   }
+
   req.user = payload;
   next();
 };
