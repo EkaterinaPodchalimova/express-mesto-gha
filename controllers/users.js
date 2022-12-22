@@ -52,13 +52,13 @@ module.exports.postUsers = (req, res) => {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then((user) => res.status(STATUS_201).send({ data: user }))
+    .then((user) => res.status(STATUS_201).send({
+      _id: user._id,
+      email: user.email,
+    }))
     .catch((err) => {
       if (err.code === 11000) {
         return res.status(ERROR_CODE_409).send({ message: 'Пользователь с таким email уже существует' });
-      }
-      if (err.name === 'ValidationError') {
-        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
       }
       return res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' });
     });
@@ -77,9 +77,6 @@ module.exports.editUsers = (req, res) => {
       if (err.name === 'ValidationError') {
         return res.status(ERROR_CODE_400).send({ message: 'Пользователь по указанному _id не найден' });
       }
-      if (err.name === 'CastError') {
-        return res.status(ERROR_CODE_404).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
-      }
       return res.status(ERROR_CODE_500).send({ message: `Произошла ошибка ${err.name}` });
     });
 };
@@ -91,9 +88,6 @@ module.exports.editAvatar = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(ERROR_CODE_400).send({ message: 'Пользователь по указанному _id не найден.' });
-      }
-      if (err.name === 'CastError') {
-        return res.status(ERROR_CODE_404).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
       }
       return res.status(ERROR_CODE_500).send({ message: `Произошла ошибка ${err.name}` });
     });
