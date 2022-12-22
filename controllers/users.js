@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const {
-  ERROR_CODE_400, ERROR_CODE_404, ERROR_CODE_500, ERROR_CODE_409, STATUS_201,
+  ERROR_CODE_400, ERROR_CODE_404, ERROR_CODE_409, ERROR_CODE_500, STATUS_201,
 } = require('../utils/constants');
 
 module.exports.getUsers = (req, res) => {
