@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { celebrate, Joi, Segments } = require('celebrate');
+const auth = require('../middlewares/auth');
 const {
   getUsers, getUsersById, getUserNow, editUsers, editAvatar,
 } = require('../controllers/users');
@@ -8,17 +9,12 @@ router.get('/', celebrate({
   [Segments.HEADERS]: Joi.object().keys({
     authorization: Joi.string(),
   }).unknown(true),
-}), getUsers);
-router.get('/:userId', celebrate({
-  [Segments.HEADERS]: Joi.object().keys({
-    authorization: Joi.string(),
-  }).unknown(true),
-}), getUsersById);
+}), auth, getUsers);
 router.get('/me', celebrate({
   [Segments.HEADERS]: Joi.object().keys({
     authorization: Joi.string(),
   }).unknown(true),
-}), getUserNow);
+}), auth, getUserNow);
 router.patch('/me', celebrate({
   [Segments.BODY]: Joi.object().keys({
     name: Joi.string().min(2).max(30).default('Жак-Ив Кусто'),
@@ -36,5 +32,6 @@ router.patch('/me/avatar', celebrate({
     authorization: Joi.string(),
   }).unknown(true),
 }), editAvatar);
+router.get('/:userId', getUsersById);
 
 module.exports = router;

@@ -31,15 +31,9 @@ module.exports.getUsersById = (req, res) => {
 module.exports.getUserNow = (req, res) => {
   User.findById(req.user._id)
     .then((users) => {
-      if (users == null) {
-        return res.status(ERROR_CODE_404).send({ message: 'Пользователь по указанному _id не найден' });
-      }
       return res.send({ data: users });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(ERROR_CODE_400).send({ message: 'Переданы некорректные данные при создании пользователя.' });
-      }
       return res.status(ERROR_CODE_500).send({ message: `Произошла ошибка ${err.name}` });
     });
 };
