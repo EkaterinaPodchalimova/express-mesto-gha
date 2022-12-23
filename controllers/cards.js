@@ -1,39 +1,39 @@
-const {
-  ERROR_CODE_404, ERROR_CODE_500, STATUS_201, ERROR_CODE_403,
-} = require('../utils/constants');
+const { STATUS_201 } = require('../utils/constants');
+const { DeleteCardError } = require('../errors/delete-card-error');
+const { NotFoundError } = require('../errors/not-found-error');
 const Card = require('../models/card');
 
-module.exports.getCard = (req, res) => {
+module.exports.getCard = (req, res, next) => {
   Card.find({})
     .populate(['owner', 'likes'])
     .then((card) => res.send({ data: card }))
-    .catch(() => res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' }));
+    .catch(next);
 };
 
-module.exports.deleteCardsById = (req, res) => {
+module.exports.deleteCardsById = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
       if (card == null) {
-        return res.status(ERROR_CODE_404).send({ message: 'Передан несуществующий _id карточки.' });
+        throw new NotFoundError('Пользователь по указанному _id не найден');
       }
       if (!(card.owner._id.toString() === req.user._id)) {
-        return res.status(ERROR_CODE_403).send({ message: 'Вы не можете удалить чужую карточку!' });
+        throw new DeleteCardError('Вы не можете удалить чужую карточку!');
       }
       return Card.findByIdAndRemove(req.params.cardId)
         .then((cardDelete) => res.send({ data: cardDelete }))
-        .catch(() => res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' }));
+        .catch(next);
     })
-    .catch(() => res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' }));
+    .catch(next);
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   Card.create({ name, owner: req.user._id, link })
     .then((card) => res.status(STATUS_201).send({ data: card }))
-    .catch(() => res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' }));
+    .catch(next);
 };
 
-module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
+module.exports.likeCard = (req, res, next) => Card.findByIdAndUpdate(
   req.params.cardId,
   {
     $addToSet: { likes: req.user._id },
@@ -43,13 +43,13 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
   .populate(['owner', 'likes'])
   .then((card) => {
     if (card == null) {
-      return res.status(ERROR_CODE_404).send({ message: 'Передан несуществующий _id карточки.' });
+      throw new NotFoundError('Пользователь по указанному _id не найден');
     }
     return res.send({ data: card });
   })
-  .catch((err) => res.status(ERROR_CODE_500).send({ message: `Произошла ошибка ${err.status}` }));
+  .catch(next);
 
-module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
+module.exports.dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
   req.params.cardId,
   {
     $pull: { likes: req.user._id },
@@ -59,8 +59,8 @@ module.exports.dislikeCard = (req, res) => Card.findByIdAndUpdate(
   .populate(['owner', 'likes'])
   .then((card) => {
     if (card == null) {
-      return res.status(ERROR_CODE_404).send({ message: 'Передан несуществующий _id карточки.' });
+      throw new NotFoundError('Пользователь по указанному _id не найден');
     }
     return res.send({ data: card });
   })
-  .catch(() => res.status(ERROR_CODE_500).send({ message: 'Произошла ошибка' }));
+  .catch(next);

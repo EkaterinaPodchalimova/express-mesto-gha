@@ -1,19 +1,21 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+require('dotenv').config();
 const {
   celebrate, Joi, Segments, errors,
 } = require('celebrate');
-const { ERROR_CODE_404 } = require('./utils/constants');
+const { NotFoundError } = require('./errors/not-found-error');
 const { postUsers, login } = require('./controllers/users');
 
+const { MONGOOSE_ENV } = process.env;
 const { PORT = 3000 } = process.env;
 const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.connect('mongodb://localhost:27017/mestodb');
+mongoose.connect(MONGOOSE_ENV === 'mongodb://localhost:27017/mestodb');
 
 app.post('/signin', celebrate({
   [Segments.BODY]: Joi.object().keys({
@@ -36,8 +38,7 @@ app.use('/cards', require('./routes/cards'));
 
 app.use(errors());
 app.use((req, res, next) => {
-  res.status(ERROR_CODE_404).send({ message: 'Страница не найдена' });
-  next();
+  next(new NotFoundError('Страница не найдена'));
 });
 
 app.listen(PORT);
