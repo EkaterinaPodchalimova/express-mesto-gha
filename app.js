@@ -15,7 +15,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.connect(MONGOOSE_ENV === 'mongodb://localhost:27017/mestodb');
+mongoose.connect(MONGOOSE_ENV);
 
 app.post('/signin', celebrate({
   [Segments.BODY]: Joi.object().keys({
