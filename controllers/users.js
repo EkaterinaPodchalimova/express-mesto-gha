@@ -50,7 +50,7 @@ module.exports.postUsers = (req, res, next) => {
       avatar: user.avatar,
     }))
     .catch((err) => {
-      if (err.statusCode === 11000) {
+      if (err.code === 11000) {
         next(new AlreadyExistsError('Пользователь с таким email уже существует'));
       }
     });
