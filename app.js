@@ -37,6 +37,10 @@ app.post('/signup', celebrate({
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
+app.use('/*', () => {
+  throw new NotFoundError('Страница не найдена');
+});
+
 app.use(errors());
 app.use((err, req, res, next) => {
   const { status = STATUS_500, message } = err;
@@ -48,10 +52,6 @@ app.use((err, req, res, next) => {
         : message,
     });
   next();
-});
-
-app.use((err, req, res, next) => {
-  next(new NotFoundError('Страница не найдена'));
 });
 
 app.listen(PORT);
