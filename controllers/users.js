@@ -5,10 +5,10 @@ const User = require('../models/user');
 const { JWT_SECRET } = process.env;
 
 const { STATUS_201 } = require('../utils/constants');
-const { NotFoundError } = require('../errors/not-found-error');
-const { AlreadyExistsError } = require('../errors/already-exist-error');
-const { EditError } = require('../errors/edit-error');
-const { LoginError } = require('../errors/login-error');
+const NotFoundError = require('../errors/not-found-error');
+const AlreadyExistsError = require('../errors/already-exist-error');
+const EditError = require('../errors/edit-error');
+const LoginError = require('../errors/login-error');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -38,7 +38,6 @@ module.exports.postUsers = (req, res, next) => {
     name, about, avatar, email, password,
   } = req.body;
   bcrypt.hash(password, 10)
-    .orFail(new AlreadyExistsError('Пользователь с таким email уже существует'))
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
@@ -49,6 +48,7 @@ module.exports.postUsers = (req, res, next) => {
       about: user.about,
       avatar: user.avatar,
     }))
+    .orFail(new AlreadyExistsError('Пользователь с таким email уже существует'))
     .catch(next);
 };
 
@@ -79,11 +79,7 @@ module.exports.login = (req, res) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       res.send({
-        token: jwt.sign(
-          { _id: user._id },
-          JWT_SECRET,
-          { expiresIn: '7d' },
-        ),
+        token: jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' }),
       });
     })
     .catch((err, next) => {

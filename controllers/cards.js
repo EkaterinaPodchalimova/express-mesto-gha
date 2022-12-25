@@ -1,6 +1,6 @@
 const { STATUS_201 } = require('../utils/constants');
-const { DeleteCardError } = require('../errors/delete-card-error');
-const { NotFoundError } = require('../errors/not-found-error');
+const DeleteCardError = require('../errors/delete-card-error');
+const NotFoundError = require('../errors/not-found-error');
 const Card = require('../models/card');
 
 module.exports.getCard = (req, res, next) => {

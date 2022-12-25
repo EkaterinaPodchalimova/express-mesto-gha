@@ -5,7 +5,7 @@ require('dotenv').config();
 const {
   celebrate, Joi, Segments, errors,
 } = require('celebrate');
-const { NotFoundError } = require('./errors/not-found-error');
+const NotFoundError = require('./errors/not-found-error');
 const { postUsers, login } = require('./controllers/users');
 
 const { MONGOOSE_ENV } = process.env;
