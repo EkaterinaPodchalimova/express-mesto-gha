@@ -77,7 +77,7 @@ module.exports.editAvatar = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -86,5 +86,5 @@ module.exports.login = (req, res) => {
         token: jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' }),
       });
     })
-    .catch((err, next) => next(new LoginError(err.message)));
+    .catch((err) => next(new LoginError(err.message)));
 };
