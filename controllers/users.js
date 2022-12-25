@@ -37,7 +37,8 @@ module.exports.postUsers = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  bcrypt.hash(password, 10)
+  bcrypt
+    .hash(password, 10)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
@@ -48,8 +49,11 @@ module.exports.postUsers = (req, res, next) => {
       about: user.about,
       avatar: user.avatar,
     }))
-    .orFail(new AlreadyExistsError('Пользователь с таким email уже существует'))
-    .catch(next);
+    .catch((err) => {
+      if (err.statusCode === 11000) {
+        next(new AlreadyExistsError('Пользователь с таким email уже существует'));
+      }
+    });
 };
 
 module.exports.editUsers = (req, res, next) => {
@@ -82,7 +86,5 @@ module.exports.login = (req, res) => {
         token: jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' }),
       });
     })
-    .catch((err, next) => {
-      next(new LoginError(err.message));
-    });
+    .catch((err, next) => next(new LoginError(err.message)));
 };

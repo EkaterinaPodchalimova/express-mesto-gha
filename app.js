@@ -7,6 +7,7 @@ const {
 } = require('celebrate');
 const NotFoundError = require('./errors/not-found-error');
 const { postUsers, login } = require('./controllers/users');
+const { STATUS_500 } = require('./utils/constants');
 
 const { MONGOOSE_ENV } = process.env;
 const { PORT = 3000 } = process.env;
@@ -37,7 +38,19 @@ app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
 app.use(errors());
-app.use((req, res, next) => {
+app.use((err, req, res, next) => {
+  const { status = STATUS_500, message } = err;
+  res
+    .status(status)
+    .send({
+      message: (status === STATUS_500)
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
+  next();
+});
+
+app.use((err, req, res, next) => {
   next(new NotFoundError('Страница не найдена'));
 });
 
